@@ -1,29 +1,25 @@
 import socket
 from Crypto.PublicKey import RSA
-
+from config import HOST, PORT
  
-def Main():
-    # with open('server_private_key', 'r') as f:
-    #     privkey = RSA.importKey(f.read())
-    host = '127.0.0.1'
-    port = 5000
-
+def run_client():
     with open('server_public_key', 'r') as f:
-        pubkey = RSA.importKey(f.read())
+        server_public_key = RSA.importKey(f.read())
 
-    print(pubkey)
+    print(server_public_key)
 
     print('keys loaded \n')
      
     mySocket = socket.socket()
-    mySocket.connect((host,port))
+    mySocket.connect((HOST, PORT))
      
     message = str(input(" -> "))
      
     while message != 'q':
         print('message ' + message)
         
-        message = pubkey.encrypt(message.encode(errors='replace'), 32)[0]
+        message = server_public_key.encrypt(message.encode(errors='replace'), 32)[0]
+        print('encrypted message' + str(message))
         mySocket.send(message)
         data = mySocket.recv(1024)
         
@@ -34,4 +30,4 @@ def Main():
     mySocket.close()
  
 if __name__ == '__main__':
-    Main()
+    run_client()
