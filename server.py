@@ -8,6 +8,10 @@ def run_server():
     with open('server_private_key', 'r') as f:
         server_private_key = RSA.importKey(f.read())
 
+    # загружаем публичный ключ клиента
+    with open('client_public_key', 'r') as f:
+        client_public_key = RSA.importKey(f.read())
+            
     print('key loaded \n')
 
     # сокет и привязываем его к определенному адресу
@@ -27,11 +31,15 @@ def run_server():
             break
 
         # дешифруем данные своим приватным ключом
-        d = server_private_key.decrypt(data)
+        data = server_private_key.decrypt(data)
+        print ("i get it from client after encryption: " + str(data))
 
-        print ("i get it from client after encryption: " + str(d))
+        # вводим сообщение с клавиатуры, и шифруем его публичным ключом клиента
+        message = input(" -> ")
+        message = client_public_key.encrypt(message.encode(errors = 'replace'), 32)[0]
+        
         # отправляем данные клиенту
-        conn.send(d)
+        conn.send(message)
     # закрываем соединение     
     conn.close()
      
